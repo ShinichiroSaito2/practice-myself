@@ -1,0 +1,143 @@
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: url('background.png') center center no-repeat;
+  background-size: contain;
+  background-color: #a3d9a5; /* 明るい緑系の補色 */
+  color: #333;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+  pointer-events: auto; /* クリック可能にする */
+  z-index: 1; /* 他の要素より前面に表示 */
+}
+
+.hidden {
+  display: none;
+}
+
+#start-screen h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+#ranking {
+  margin-bottom: 20px;
+}
+
+#ranking-list {
+  list-style: none;
+  padding: 0;
+}
+
+#start-button {
+  padding: 10px 20px;
+  font-size: 1.2em;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#scoreboard {
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+.hole {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.mole {
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  height: 100%;
+  background: url('mole.png') center/contain no-repeat;
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+@keyframes slideUp {
+  to {
+    bottom: 0;
+  }
+}
+
+@keyframes slideDown {
+  to {
+    bottom: -100%;
+  }
+}
+
+.hit-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 1.2em;
+  color: yellow;
+  font-weight: bold;
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+#countdown {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: none;
+  pointer-events: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#countdown-number {
+  font-size: 5em;
+  color: #333;
+  animation: scaleUp 0.5s ease-in-out;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
