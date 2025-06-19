@@ -8,58 +8,61 @@ const rankingList = document.getElementById('ranking-list');
 const countdownOverlay = document.getElementById('countdown');
 const countdownNumber = document.getElementById('countdown-number');
 
-let score = 0;
-let timeLeft = 30;
-let gameInterval;
-let moleCount = 0;
-let maxMoles = 20;
-let baseSpeed = 500;
+let score = 0; // スコア初期値
+let timeLeft = 15; // ゲーム残り時間
+let gameInterval; // ゲームタイマー
+let moleCount = 0; // モグラカウント初期値
+let maxMoles = 100; // maxモグラ数
+let baseSpeed = 1000; // モグラ出現の基本速度（ミリ秒）
 
 function showRanking() {
   const ranking = JSON.parse(localStorage.getItem('ranking')) || [];
-  rankingList.innerHTML = '';
-  ranking.slice(0, 3).forEach((entry, index) => {
-    const li = document.createElement('li');
-    li.textContent = `${index + 1}位: ${entry}回`;
-    rankingList.appendChild(li);
+  rankingList.innerHTML = ''; // ランキングのクリア
+  ranking.slice(0, 3).forEach((entry, index) => { // slice: 上位3つのスコア表示
+    const li = document.createElement('li'); // ランキングリストliの作成
+    li.textContent = `${index + 1}位: ${entry}回`; 
+    rankingList.appendChild(li); // ランキングリストに追加
   });
 }
 
-function startCountdown(callback) {
-  const countdownValues = ['3', '2', '1', 'Start!'];
-  let index = 0;
+// カウントダウンの開始
+// カウントダウンの値は配列にあり、1秒ごとに表示を更新する
+function startCountdown(callback) { 
+  const countdownValues = ['3', '2', '1', 'Start!']; // カウントダウン
+  countdownOverlay.classList.remove('hidden'); // カウントダウンオーバーレイの表示
+  countdownNumber.style.fontSize = '2em'; // フォントサイズの設定
 
-  countdownOverlay.classList.remove('hidden');
-  countdownNumber.textContent = countdownValues[index];
-
-  const countdownInterval = setInterval(() => {
+  let index = 0; 
+  countdownNumber.textContent = countdownValues[index]; // カウントダウンの初期値設定（3）
+  const countdownInterval = setInterval(() => { // カウントダウンのインターバル
     index++;
-    if (index < countdownValues.length) {
-      countdownNumber.textContent = countdownValues[index];
+    if (index < countdownValues.length) { 
+      countdownNumber.textContent = countdownValues[index]; // カウントダウンの更新
     } else {
-      clearInterval(countdownInterval);
+      clearInterval(countdownInterval); // カウントダウン終了
       countdownOverlay.classList.add('hidden');
       callback(); // ゲーム開始
     }
-  }, 1000);
+  }, 1000); // 1秒ごとにカウントダウン更新
 }
 
 function startGame() {
   score = 0;
-  timeLeft = 30;
+  timeLeft = 15; // タイマー初期値
+  baseSpeed = 1000; // モグラ出現の基本速度の初期化
   moleCount = 0;
-  scoreDisplay.textContent = score;
-  timerDisplay.textContent = timeLeft;
-  startScreen.classList.add('hidden');
-  gameScreen.classList.remove('hidden');
-  gameInterval = setInterval(updateTimer, 1000);
+  scoreDisplay.textContent = score; // スコアの初期化
+  timerDisplay.textContent = timeLeft; // タイマーの初期化
+  startScreen.classList.add('hidden'); // スタート画面を非表示
+  gameScreen.classList.remove('hidden'); // ゲーム画面を表示
+  gameInterval = setInterval(updateTimer, 1000); // タイマーの更新を1秒ごとに実行
   spawnMole();
 }
 
 function updateTimer() {
-  timeLeft--;
-  timerDisplay.textContent = timeLeft;
-  if (timeLeft <= 0 || moleCount >= maxMoles) {
+  timeLeft--; // タイマーを1秒減らす
+  timerDisplay.textContent = timeLeft; // タイマーの表示を更新
+  if (timeLeft <= 0 || moleCount >= maxMoles) { 
     endGame();
   }
 }
@@ -124,7 +127,13 @@ function endGame() {
 
 startButton.addEventListener('click', () => {
   console.log('ゲーム開始ボタンがクリックされました。');
-  startCountdown(startGame);
+  startButton.disabled = true; // ボタンを無効化
+  startCountdown(() => {
+    startGame();
+    startButton.disabled = false; // ゲーム終了後にボタンを再度有効化
+  });
 });
+
+document.head.appendChild(style);
 
 showRanking();
