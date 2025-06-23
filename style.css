@@ -28,7 +28,7 @@ body {
 #start-screen h1 {
   font-size: 5em;
   margin-bottom: 20px;
-  background-color: #4caf50;
+  /* background-color: #4caf50; */
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -64,6 +64,45 @@ body {
   background-color: #45a049;
 }
 
+#back-button {
+  padding: 10px 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#back-button:hover {
+  background-color: #45a049;
+}
+
+#intro-button {
+  padding: 10px 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#intro-button:hover {
+  background-color: #45a049;
+}
+
+#intro-screen {
+  display: none; /* 初期状態では非表示 */
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: auto;
+}
+
 #scoreboard {
   display: flex;
   justify-content: space-around;
@@ -94,9 +133,8 @@ body {
 
 .mole {
   position: absolute;
-  bottom: -100%;
-  width: 100%;
-  height: 100%;
+  width: 180px;
+  height: 180px;
   background: url('mole.png') center/contain no-repeat;
   animation: slideUp 0.5s ease-out forwards;
 }
@@ -115,11 +153,13 @@ body {
 
 .hit-label {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 1.2em;
-  color: yellow;
+  top: -20px;   /* モグラより上に浮かせる */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4.8em;  /* もとの4倍程度 */
+  color: rgba(255, 255, 0, 0.9); /* 黄色で少し透ける */
   font-weight: bold;
+  text-shadow: 2px 2px 5px #000;
   animation: fadeOut 0.5s ease-out forwards;
 }
 

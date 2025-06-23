@@ -1,6 +1,9 @@
-
 const startButton = document.getElementById('start-button');
 const startScreen = document.getElementById('start-screen');
+const introScreen = document.getElementById('intro-screen');
+const introButton = document.getElementById('intro-button');
+const introOverlay = document.getElementById('countdown');
+const backButton = document.getElementById('back-button');
 const gameScreen = document.getElementById('game-screen');
 const scoreDisplay = document.getElementById('score');
 const timerDisplay = document.getElementById('timer');
@@ -9,7 +12,7 @@ const countdownOverlay = document.getElementById('countdown');
 const countdownNumber = document.getElementById('countdown-number');
 
 let score = 0; // スコア初期値
-let timeLeft = 15; // ゲーム残り時間
+let timeLeft = 30; // ゲーム残り時間
 let gameInterval; // ゲームタイマー
 let moleCount = 0; // モグラカウント初期値
 let maxMoles = 100; // maxモグラ数
@@ -20,23 +23,37 @@ function showRanking() {
   rankingList.innerHTML = ''; // ランキングのクリア
   ranking.slice(0, 3).forEach((entry, index) => { // slice: 上位3つのスコア表示
     const li = document.createElement('li'); // ランキングリストliの作成
-    li.textContent = `${index + 1}位: ${entry}回`; 
+    li.textContent = `${index + 1}位: ${entry}匹匹`;
     rankingList.appendChild(li); // ランキングリストに追加
   });
 }
 
+// 「遊び方」ボタンで説明画面に切り替え
+introButton.addEventListener('click', () => {
+  introScreen.style.display = 'flex';  // 直接display:flexに切り替え
+  startScreen.style.display = 'none';
+});
+
+backButton.addEventListener('click', () => {
+  introScreen.style.display = 'none';
+  startScreen.style.display = 'flex';
+});
+
+
 // カウントダウンの開始
 // カウントダウンの値は配列にあり、1秒ごとに表示を更新する
-function startCountdown(callback) { 
+function startCountdown(callback) {
   const countdownValues = ['3', '2', '1', 'Start!']; // カウントダウン
   countdownOverlay.classList.remove('hidden'); // カウントダウンオーバーレイの表示
-  countdownNumber.style.fontSize = '2em'; // フォントサイズの設定
-
-  let index = 0; 
+  countdownNumber.style.fontSize = '4em';
+  countdownNumber.style.color = '#f00';
+  countdownNumber.style.textShadow = '2px 2px 10px rgba(0,0,0,0.5)';
+  
+  let index = 0;
   countdownNumber.textContent = countdownValues[index]; // カウントダウンの初期値設定（3）
   const countdownInterval = setInterval(() => { // カウントダウンのインターバル
     index++;
-    if (index < countdownValues.length) { 
+    if (index < countdownValues.length) {
       countdownNumber.textContent = countdownValues[index]; // カウントダウンの更新
     } else {
       clearInterval(countdownInterval); // カウントダウン終了
@@ -47,10 +64,6 @@ function startCountdown(callback) {
 }
 
 function startGame() {
-  score = 0;
-  timeLeft = 15; // タイマー初期値
-  baseSpeed = 1000; // モグラ出現の基本速度の初期化
-  moleCount = 0;
   scoreDisplay.textContent = score; // スコアの初期化
   timerDisplay.textContent = timeLeft; // タイマーの初期化
   startScreen.classList.add('hidden'); // スタート画面を非表示
@@ -62,31 +75,61 @@ function startGame() {
 function updateTimer() {
   timeLeft--; // タイマーを1秒減らす
   timerDisplay.textContent = timeLeft; // タイマーの表示を更新
-  if (timeLeft <= 0 || moleCount >= maxMoles) { 
+  if (timeLeft <= 0 || moleCount >= maxMoles) {
     endGame();
   }
+}
+
+function getRandomPosition() {
+  const gameArea = gameScreen.getBoundingClientRect();
+  const rows = 4;
+  const cols = 5;
+
+  const paddingX = 300; // 左右の余白
+  const paddingBottom = 100; // 👈 下方向の余白（px）
+
+  const totalWidth = gameArea.width - paddingX * 2;
+  const totalHeight = gameArea.height - paddingBottom; // 👈 下方向余白を引く
+
+  const cellWidth = totalWidth / cols;
+  const cellHeight = totalHeight / rows;
+
+  const startY = gameArea.top + (cellHeight * 2); // 下半分スタート
+
+  const positions = [];
+  for (let row = 0; row < 2; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = gameArea.left + paddingX + col * cellWidth + cellWidth / 2;
+      const y = startY + row * cellHeight + cellHeight / 2;
+      positions.push({ x, y });
+    }
+  }
+
+  const randomIndex = Math.floor(Math.random() * positions.length);
+  return positions[randomIndex];
 }
 
 function spawnMole() {
   if (moleCount >= maxMoles || timeLeft <= 0) return;
 
-  const holes = document.querySelectorAll('.hole');
-  const index = Math.floor(Math.random() * holes.length);
-  const hole = holes[index];
-
+  const position = getRandomPosition(); // 位置を取得
   const mole = document.createElement('div');
   mole.classList.add('mole');
+
+  mole.style.position = 'absolute';
+  mole.style.left = `${position.x}px`;
+  mole.style.top = `${position.y}px`;
+  mole.style.transform = 'translate(-50%, -50%)'; // 中心に合わせる
 
   mole.addEventListener('click', () => {
     score++;
     scoreDisplay.textContent = score;
     mole.style.animation = 'none';
-    mole.style.bottom = '0';
 
     const hitLabel = document.createElement('div');
     hitLabel.classList.add('hit-label');
     hitLabel.textContent = 'Hit!';
-    hole.appendChild(hitLabel);
+    mole.appendChild(hitLabel);
 
     setTimeout(() => {
       hitLabel.remove();
@@ -97,7 +140,7 @@ function spawnMole() {
     baseSpeed = Math.max(200, baseSpeed - 20);
   });
 
-  hole.appendChild(mole);
+  gameScreen.appendChild(mole); // 穴ではなく gameScreen に追加
   moleCount++;
 
   setTimeout(() => {
@@ -111,18 +154,34 @@ function spawnMole() {
   }, baseSpeed);
 }
 
+function showFinishMessage(callback) {
+  countdownOverlay.classList.remove('hidden');
+  countdownNumber.textContent = 'Finish!';
+  
+  countdownNumber.style.fontSize = '4em';
+  countdownNumber.style.color = '#f00';
+  countdownNumber.style.textShadow = '2px 2px 10px rgba(0,0,0,0.5)';
+  
+  setTimeout(() => {
+    countdownOverlay.classList.add('hidden');
+    if (callback) callback(); // 終了後の処理（任意）
+  }, 2000); // 2秒表示
+}
+
 function endGame() {
   clearInterval(gameInterval);
   document.querySelectorAll('.mole').forEach(m => m.remove());
 
-  const ranking = JSON.parse(localStorage.getItem('ranking')) || [];
-  ranking.push(score);
-  ranking.sort((a, b) => b - a);
-  localStorage.setItem('ranking', JSON.stringify(ranking.slice(0, 3)));
+  showFinishMessage(() => {
+    const ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+    ranking.push(score);
+    ranking.sort((a, b) => b - a);
+    localStorage.setItem('ranking', JSON.stringify(ranking.slice(0, 3)));
 
-  gameScreen.classList.add('hidden');
-  startScreen.classList.remove('hidden');
-  showRanking();
+    gameScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+    showRanking();
+  });
 }
 
 startButton.addEventListener('click', () => {
