@@ -23,7 +23,7 @@ function showRanking() {
   rankingList.innerHTML = ''; // ランキングのクリア
   ranking.slice(0, 3).forEach((entry, index) => { // slice: 上位3つのスコア表示
     const li = document.createElement('li'); // ランキングリストliの作成
-    li.textContent = `${index + 1}位: ${entry}匹匹`;
+    li.textContent = `${index + 1}位: ${entry}匹`;
     rankingList.appendChild(li); // ランキングリストに追加
   });
 }
